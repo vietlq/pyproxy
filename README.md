@@ -23,7 +23,7 @@ The auxiliary port is `8181`. Anything sent to this port will be broadcasted to 
 
 #### Notes
 
-You may use telnet to `test` small messages manually.
+You may use `telnet` to test small messages manually.
 
 Never ever use `telnet` to send receive files or messages. Use `netcat` instead.
 
