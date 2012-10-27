@@ -40,6 +40,9 @@ class ProxySocket(asyncore.dispatcher):
         
         self.counterpart = None
         
+        self.bytes_read = 0
+        self.bytes_sent = 0
+        
         self.logger.debug("Done with __init__")
     
     def set_counterpart(self, counterpart):
@@ -54,23 +57,30 @@ class ProxySocket(asyncore.dispatcher):
         buff = self.recv(BUF_SIZE)
         buff_size = len(buff)
         self.logger.debug("Received %d bytes" % buff_size)
+        self.bytes_read += buff_size
+        
         if 0 == buff_size:
             self.counterpart.handle_close()
         
         if self.counterpart:
             try:
                 self.counterpart.send(buff)
+                self.bytes_sent += buff_size
             except:
                 self.logger.debug('Could not write to the counterpart')
                 self.handle_close()
     
     def handle_close(self):
         self.logger.debug("handle_close()")
+        self.logger.debug('Total bytes read = %d' % self.bytes_read)
+        self.logger.debug('Total bytes sent = %d' % self.bytes_sent)
         self.close()
 
 class MainClientSocket(ProxySocket):
     def handle_close(self):
         self.logger.debug("handle_close()")
+        self.logger.debug('Total bytes read = %d' % self.bytes_read)
+        self.logger.debug('Total bytes sent = %d' % self.bytes_sent)
         self.close()
         remove_proxy_socket(self)
 
@@ -79,6 +89,9 @@ class AuxSocket(asyncore.dispatcher):
         asyncore.dispatcher.__init__(self, sock)
         
         self.logger = logging.getLogger('AuxSocket %s' % str(name))
+        
+        self.bytes_read = 0
+        self.bytes_sent = 0
         
         self.logger.debug("Done with __init__")
     
@@ -89,12 +102,15 @@ class AuxSocket(asyncore.dispatcher):
         self.logger.debug("handle_read()")
         
         buff = self.recv(BUF_SIZE)
-        self.logger.debug("Received %d bytes" % len(buff))
+        buff_size = len(buff)
+        self.logger.debug("Received %d bytes" % buff_size)
+        self.bytes_read += buff_size
         
         global main_clients
         for client in main_clients:
             try:
                 client.send(buff)
+                self.bytes_sent += buff_size
             except:
                 self.logger.debug(
                     'Could not write to the client %s'
@@ -103,6 +119,8 @@ class AuxSocket(asyncore.dispatcher):
     
     def handle_close(self):
         self.logger.debug("handle_close()")
+        self.logger.debug('Total bytes read = %d' % self.bytes_read)
+        self.logger.debug('Total bytes sent = %d' % self.bytes_sent)
         self.close()
 
 class TcpAuxServer(asyncore.dispatcher):
