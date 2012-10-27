@@ -52,7 +52,10 @@ class ProxySocket(asyncore.dispatcher):
         self.logger.debug("handle_read()")
         
         buff = self.recv(BUF_SIZE)
-        self.logger.debug("Received %d bytes" % len(buff))
+        buff_size = len(buff)
+        self.logger.debug("Received %d bytes" % buff_size)
+        if 0 == buff_size:
+            self.counterpart.handle_close()
         
         if self.counterpart:
             try:
