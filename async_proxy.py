@@ -84,11 +84,11 @@ class MainClientSocket(ProxySocket):
         self.close()
         remove_proxy_socket(self)
 
-class AuxSocket(asyncore.dispatcher):
+class InjectionSocket(asyncore.dispatcher):
     def __init__(self, sock, name):
         asyncore.dispatcher.__init__(self, sock)
         
-        self.logger = logging.getLogger('AuxSocket %s' % str(name))
+        self.logger = logging.getLogger('InjectionSocket %s' % str(name))
         
         self.bytes_read = 0
         self.bytes_sent = 0
@@ -123,11 +123,11 @@ class AuxSocket(asyncore.dispatcher):
         self.logger.debug('Total bytes sent = %d' % self.bytes_sent)
         self.close()
 
-class TcpAuxServer(asyncore.dispatcher):
+class TcpInjectionServer(asyncore.dispatcher):
     def __init__(self, address):
         asyncore.dispatcher.__init__(self)
         
-        self.logger = logging.getLogger('TcpAuxServer')
+        self.logger = logging.getLogger('TcpInjectionServer')
         
         self.create_socket(socket.AF_INET, socket.SOCK_STREAM)
         #  This must come before binding
@@ -155,15 +155,15 @@ class TcpAuxServer(asyncore.dispatcher):
             
             try:
                 client_name = 'Client %d' % self.handlerCount
-                aux_client = AuxSocket(client_sock, client_name)
+                inject_client = InjectionSocket(client_sock, client_name)
             except Exception:
-                sys.stderr.write('Something really bad happened! aux_client :(\n')
+                sys.stderr.write('Something really bad happened! inject_client :(\n')
         else:
             self.logger.debug("Nothing to accept :(")
             self.close()
 
 class TcpProxyServer(asyncore.dispatcher):
-    def __init__(self, address, remote_info, aux_port = -1):
+    def __init__(self, address, remote_info, inject_port = -1):
         asyncore.dispatcher.__init__(self)
         
         self.logger = logging.getLogger('TcpProxyServer')
@@ -181,10 +181,10 @@ class TcpProxyServer(asyncore.dispatcher):
         
         self.remote_info = remote_info
         
-        if aux_port >= 0:
+        if inject_port >= 0:
             self.logger.debug("Initializing auxiliary server")
-            aux_addr = (address[0], aux_port)
-            self.aux_server = TcpAuxServer(aux_addr)
+            inject_addr = (address[0], inject_port)
+            self.inject_server = TcpInjectionServer(inject_addr)
         else:
             self.logger.debug("No auxiliary server required")
         
@@ -230,7 +230,7 @@ if __name__ == '__main__':
     
     if (len(sys.argv) < 3) or (len(sys.argv) > 4):
         logging.debug(
-            'Usage: %s <main_port> <remote_addr:remote_port> [aux_port]'
+            'Usage: %s <main_port> <remote_addr:remote_port> [inject_port]'
             % sys.argv[0]
         )
         exit(1)
@@ -238,14 +238,14 @@ if __name__ == '__main__':
     main_port = int(float(sys.argv[1]))
     remote_info = sys.argv[2].split(':')
     remote_info[1] = int(float(remote_info[1]))
-    aux_port = -1
+    inject_port = -1
     
     if len(sys.argv) == 4:
-        aux_port = int(float(sys.argv[3]))
+        inject_port = int(float(sys.argv[3]))
     
     address = ('0.0.0.0', main_port)
     logging.debug("Initializing a TcpProxyServer instance")
-    echoServer = TcpProxyServer(address, remote_info, aux_port)
+    echoServer = TcpProxyServer(address, remote_info, inject_port)
     
     logging.debug("Before the LOOP")
     asyncore.loop()
