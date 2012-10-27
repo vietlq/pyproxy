@@ -110,6 +110,10 @@ class InjectionSocket(asyncore.dispatcher):
         for client in main_clients:
             try:
                 client.send(buff)
+                self.logger.debug(
+                    'Sent %d bytes to the client %s'
+                    % (buff_size, client.client_addr)
+                )
                 self.bytes_sent += buff_size
             except:
                 self.logger.debug(
