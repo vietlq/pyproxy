@@ -11,6 +11,9 @@ class EchoHandler(asyncore.dispatcher):
         
         self.logger = logging.getLogger('EchoHandler %s' % str(name))
         
+        self.bytes_read = 0
+        self.bytes_sent = 0
+        
         self.logger.debug("Done with __init__")
     
     def handle_connect(self):
@@ -18,15 +21,22 @@ class EchoHandler(asyncore.dispatcher):
     
     def handle_read(self):
         self.logger.debug("handle_read()")
+        
         buff = self.recv(BUF_SIZE)
-        self.logger.debug("Received %d bytes" % len(buff))
+        buff_size = len(buff)
+        self.logger.debug("Received %d bytes" % buff_size)
+        self.bytes_read += buff_size
+        
         try:
             self.send(buff)
+            self.bytes_sent += buff_size
         except:
             self.logger.debug("Could not write!")
     
     def handle_close(self):
         self.logger.debug("handle_close()")
+        self.logger.debug('Total bytes read = %d' % self.bytes_read)
+        self.logger.debug('Total bytes sent = %d' % self.bytes_sent)
         self.close()
     
 
