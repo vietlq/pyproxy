@@ -27,6 +27,8 @@ You may use `telnet` to test small messages manually.
 
 Never ever use `telnet` to send receive files or messages. Use `netcat` instead.
 
+*The reason*: I witnessed `telnet` sending some padding bytes or dropping some messages
+
 DO:
 
 `nc 127.0.0.1 8181 < /tmp/original_file.pdf`
@@ -42,5 +44,3 @@ DO:
 DON'T:
 
 `telnet 127.0.0.1 8080 > /tmp/received_file.pdf`
-
-*The reason*: I witnessed `telnet` sending some padding bytes or dropping some messages
