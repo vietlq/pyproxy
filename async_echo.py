@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import socket, asyncore, logging
+import socket, asyncore, logging, sys
 
 MAX_CLIENT_NUM = 100
 BUF_SIZE = 4096
@@ -67,7 +67,14 @@ class EchoServer(asyncore.dispatcher):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, format='%(name)s: %(message)s')
     
-    address = ('localhost', 9090)
+    if len(sys.argv) != 3:
+        sys.stderr.write('Usage: %s <host_name> <port_number>\n')
+        exit(1)
+    
+    host_name = sys.argv[1]
+    port_number = int(float(sys.argv[2]))
+    
+    address = (host_name, port_number)
     logging.debug("Initializing an EchoServer instance")
     echoServer = EchoServer(address)
     
