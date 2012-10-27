@@ -17,7 +17,7 @@ The main port is `8080`.
 
 The main port is `8080`.
 
-The auxiliary port is `8181`. Anything sent to this port will be broadcasted to all clients connected to the main port `8080`.
+The injection port is `8181`. Anything sent to this port will be broadcasted to all clients connected to the main port `8080`.
 
 `./async_proxy.py 8080 localhost:9090 8181`
 
