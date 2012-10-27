@@ -27,7 +27,7 @@ You may use `telnet` to test small messages manually.
 
 Never ever use `telnet` to send receive files or messages. Use `netcat` instead.
 
-*The reason*: I witnessed `telnet` sending some padding bytes or dropping some messages
+**The reason**: I witnessed `telnet` sending some padding bytes or dropping some messages.
 
 DO:
 
