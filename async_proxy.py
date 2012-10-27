@@ -48,6 +48,10 @@ class ProxySocket(asyncore.dispatcher):
     def set_counterpart(self, counterpart):
         self.counterpart = counterpart
     
+    def handle_error(self):
+        self.logger.debug("handle_error()")
+        self.logger.debug("Got an error. Disconnecting.")
+    
     def handle_connect(self):
         self.logger.debug("handle_connect()")
     
