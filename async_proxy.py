@@ -51,14 +51,20 @@ class ProxySocket(asyncore.dispatcher):
         self.logger.debug("Received %d bytes" % len(buff))
         
         if self.counterpart:
-            self.counterpart.send(buff)
+            try:
+                self.counterpart.send(buff)
+            except:
+                self.logger.debug('Could not write to the counterpart')
     
     def handle_close(self):
         self.logger.debug("handle_close()")
         self.close()
-        
-        remove_proxy_socket(self)
 
+class MainClientSocket(ProxySocket):
+    def handle_close(self):
+        self.logger.debug("handle_close()")
+        self.close()
+        remove_proxy_socket(self)
 
 class AuxSocket(asyncore.dispatcher):
     def __init__(self, sock, name):
@@ -84,7 +90,6 @@ class AuxSocket(asyncore.dispatcher):
     def handle_close(self):
         self.logger.debug("handle_close()")
         self.close()
-
 
 class TcpAuxServer(asyncore.dispatcher):
     def __init__(self, address):
@@ -124,7 +129,6 @@ class TcpAuxServer(asyncore.dispatcher):
         else:
             self.logger.debug("Nothing to accept :(")
             self.close()
-
 
 class TcpProxyServer(asyncore.dispatcher):
     def __init__(self, address, remote_info, aux_port = -1):
@@ -167,7 +171,7 @@ class TcpProxyServer(asyncore.dispatcher):
             
             try:
                 client_name = 'Client %d' % self.handlerCount
-                main_client = ProxySocket(client_sock, client_name)
+                main_client = MainClientSocket(client_sock, client_name)
             except Exception:
                 sys.stderr.write('Something really bad happened! main_client :(\n')
             
@@ -188,7 +192,6 @@ class TcpProxyServer(asyncore.dispatcher):
     
     def handle_connect(self):
         self.logger.debug("handle_connect()")
-
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, format='%(name)s: %(message)s')
