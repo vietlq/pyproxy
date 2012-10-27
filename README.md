@@ -11,7 +11,7 @@ A Simple Python TCP Proxy Server With Ability to Broadcast Auxiliary Messages
 
 The main port is `8080`.
 
-`./async_proxy.py 8080 localhost:9090 8181`
+`./async_proxy.py 8080 localhost:9090`
 
 #### Starting an instance of TcpProxyServer with message injection capability
 
