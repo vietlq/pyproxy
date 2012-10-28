@@ -14,6 +14,9 @@ class EchoHandler(asyncore.dispatcher):
         self.bytes_read = 0
         self.bytes_sent = 0
         
+        self.write_buffer = ''
+        self.read_buffer = ''
+        
         self.logger.debug("Done with __init__")
     
     def handle_connect(self):
@@ -28,17 +31,27 @@ class EchoHandler(asyncore.dispatcher):
         self.bytes_read += buff_size
         
         try:
-            self.send(buff)
-            self.bytes_sent += buff_size
+            self.write_buffer += buff
         except:
             self.logger.debug("Could not write!")
+    
+    def writable(self):
+        is_writable = (len(self.write_buffer) > 0)
+        if is_writable:
+            self.logger.debug('writable() -> %s', is_writable)
+        return is_writable
+
+    def handle_write(self):
+        bytes_sent = self.send(self.write_buffer)
+        self.logger.debug('handle_write() -> sent %s bytes', bytes_sent)
+        self.write_buffer = self.write_buffer[bytes_sent:]
+        self.bytes_sent += bytes_sent
     
     def handle_close(self):
         self.logger.debug("handle_close()")
         self.logger.debug('Total bytes read = %d' % self.bytes_read)
         self.logger.debug('Total bytes sent = %d' % self.bytes_sent)
         self.close()
-    
 
 class EchoServer(asyncore.dispatcher):
     def __init__(self, address):
@@ -72,7 +85,6 @@ class EchoServer(asyncore.dispatcher):
     
     def handle_connect(self):
         self.logger.debug("handle_connect()")
-
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, format='%(name)s: %(message)s')
