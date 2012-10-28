@@ -30,7 +30,7 @@ class ProxySocket(asyncore.dispatcher):
         self.logger = logging.getLogger('ProxySocket %s' % str(name))
         
         if remote_info:
-            msg = "remote_info = %s" % remote_info
+            msg = 'remote_info = %s' % remote_info
             self.logger.debug(msg)
             self.connect((remote_info[0], remote_info[1]))
         
@@ -46,17 +46,17 @@ class ProxySocket(asyncore.dispatcher):
         self.write_buffer = ''
         self.read_buffer = ''
         
-        self.logger.debug("Done with __init__")
+        self.logger.debug('Done with __init__')
     
     def set_counterpart(self, counterpart):
         self.counterpart = counterpart
     
     def handle_error(self):
-        self.logger.debug("handle_error()")
-        self.logger.debug("Got an error. Disconnecting.")
+        self.logger.debug('handle_error()')
+        self.logger.debug('Got an error. Disconnecting.')
     
     def handle_connect(self):
-        self.logger.debug("handle_connect()")
+        self.logger.debug('handle_connect()')
     
     def readable(self):
         #is_readable = (len(self.read_buffer) > 0)
@@ -65,11 +65,11 @@ class ProxySocket(asyncore.dispatcher):
         return is_readable
 
     def handle_read(self):
-        self.logger.debug("handle_read()")
+        self.logger.debug('handle_read()')
         
         buff = self.recv(BUF_SIZE)
         buff_size = len(buff)
-        self.logger.debug("Received %d bytes" % buff_size)
+        self.logger.debug('Received %d bytes' % buff_size)
         self.bytes_read += buff_size
         self.read_buffer += buff
         bytes_left = len(self.read_buffer)
@@ -103,7 +103,7 @@ class ProxySocket(asyncore.dispatcher):
         self.bytes_sent += bytes_sent
     
     def handle_close(self):
-        self.logger.debug("handle_close()")
+        self.logger.debug('handle_close()')
         if (self.bytes_sent == self.bytes_read):
             self.logger.debug('Total bytes read = %d' % self.bytes_read)
             self.logger.debug('Total bytes sent = %d' % self.bytes_sent)
@@ -111,7 +111,7 @@ class ProxySocket(asyncore.dispatcher):
 
 class MainClientSocket(ProxySocket):
     def handle_close(self):
-        self.logger.debug("handle_close()")
+        self.logger.debug('handle_close()')
         if (self.bytes_sent == self.bytes_read):
             self.logger.debug('Total bytes read = %d' % self.bytes_read)
             self.logger.debug('Total bytes sent = %d' % self.bytes_sent)
@@ -127,17 +127,17 @@ class InjectionSocket(asyncore.dispatcher):
         self.bytes_read = 0
         self.bytes_sent = 0
         
-        self.logger.debug("Done with __init__")
+        self.logger.debug('Done with __init__')
     
     def handle_connect(self):
-        self.logger.debug("handle_connect()")
+        self.logger.debug('handle_connect()')
     
     def handle_read(self):
-        self.logger.debug("handle_read()")
+        self.logger.debug('handle_read()')
         
         buff = self.recv(BUF_SIZE)
         buff_size = len(buff)
-        self.logger.debug("Received %d bytes" % buff_size)
+        self.logger.debug('Received %d bytes' % buff_size)
         self.bytes_read += buff_size
         
         global main_clients
@@ -156,7 +156,7 @@ class InjectionSocket(asyncore.dispatcher):
                 )
     
     def handle_close(self):
-        self.logger.debug("handle_close()")
+        self.logger.debug('handle_close()')
         self.logger.debug('Total bytes read = %d' % self.bytes_read)
         self.logger.debug('Total bytes sent = %d' % self.bytes_sent)
         self.close()
@@ -180,10 +180,10 @@ class TcpInjectionServer(asyncore.dispatcher):
         
         self.handlerCount = 0
         
-        self.logger.debug("Done with __init__")
+        self.logger.debug('Done with __init__')
     
     def handle_accept(self):
-        self.logger.debug("handle_accept()")
+        self.logger.debug('handle_accept()')
         
         client_info = self.accept()
         if client_info:
@@ -197,7 +197,7 @@ class TcpInjectionServer(asyncore.dispatcher):
             except Exception:
                 sys.stderr.write('Something really bad happened! inject_client :(\n')
         else:
-            self.logger.debug("Nothing to accept :(")
+            self.logger.debug('Nothing to accept :(')
             self.close()
 
 class TcpProxyServer(asyncore.dispatcher):
@@ -220,18 +220,18 @@ class TcpProxyServer(asyncore.dispatcher):
         self.remote_info = remote_info
         
         if inject_port >= 0:
-            self.logger.debug("Initializing injection server")
+            self.logger.debug('Initializing injection server')
             inject_addr = (address[0], inject_port)
             self.inject_server = TcpInjectionServer(inject_addr)
         else:
-            self.logger.debug("No injection server required")
+            self.logger.debug('No injection server required')
         
         self.handlerCount = 0
         
-        self.logger.debug("Done with __init__")
+        self.logger.debug('Done with __init__')
     
     def handle_accept(self):
-        self.logger.debug("handle_accept()")
+        self.logger.debug('handle_accept()')
         
         client_info = self.accept()
         if client_info:
@@ -257,11 +257,11 @@ class TcpProxyServer(asyncore.dispatcher):
             
             add_proxy_socket(main_client)
         else:
-            self.logger.debug("Nothing to accept :(")
+            self.logger.debug('Nothing to accept :(')
             self.close()
     
     def handle_connect(self):
-        self.logger.debug("handle_connect()")
+        self.logger.debug('handle_connect()')
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, format='%(name)s: %(message)s')
@@ -282,9 +282,9 @@ if __name__ == '__main__':
         inject_port = int(float(sys.argv[3]))
     
     address = ('0.0.0.0', main_port)
-    logging.debug("Initializing a TcpProxyServer instance")
+    logging.debug('Initializing a TcpProxyServer instance')
     echoServer = TcpProxyServer(address, remote_info, inject_port)
     
-    logging.debug("Before the LOOP")
+    logging.debug('Before the LOOP')
     asyncore.loop()
-    logging.debug("After the LOOP")
+    logging.debug('After the LOOP')
