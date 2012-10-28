@@ -95,7 +95,7 @@ class ProxySocket(asyncore.dispatcher):
         if is_writable:
             self.logger.debug('writable() -> %s', is_writable)
         return is_writable
-
+    
     def handle_write(self):
         bytes_sent = self.send(self.write_buffer)
         self.logger.debug('handle_write() -> sent %s bytes', bytes_sent)
