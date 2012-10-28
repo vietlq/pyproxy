@@ -1,2 +1,8 @@
 
 .DS_Store
+
+in_test*
+
+out_test*
+
+*.bin
