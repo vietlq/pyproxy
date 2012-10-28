@@ -43,6 +43,8 @@ class ProxySocket(asyncore.dispatcher):
         self.bytes_read = 0
         self.bytes_sent = 0
         
+        self.write_buffer = ''
+        
         self.logger.debug("Done with __init__")
     
     def set_counterpart(self, counterpart):
@@ -79,6 +81,17 @@ class ProxySocket(asyncore.dispatcher):
         self.logger.debug('Total bytes read = %d' % self.bytes_read)
         self.logger.debug('Total bytes sent = %d' % self.bytes_sent)
         self.close()
+        
+    def writable(self):
+        is_writable = (len(self.write_buffer) > 0)
+        if is_writable:
+            self.logger.debug('writable() -> %s', is_writable)
+        return is_writable
+
+    def handle_write(self):
+        bytes_sent = self.send(self.write_buffer)
+        self.logger.debug('handle_write() -> sent %s bytes', bytes_sent)
+        self.write_buffer = self.write_buffer[bytes_sent:]
 
 class MainClientSocket(ProxySocket):
     def handle_close(self):
@@ -113,7 +126,7 @@ class InjectionSocket(asyncore.dispatcher):
         global main_clients
         for client in main_clients:
             try:
-                client.send(buff)
+                client.write_buffer += buff
                 self.logger.debug(
                     'Sent %d bytes to the client %s'
                     % (buff_size, client.client_addr)
