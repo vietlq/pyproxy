@@ -220,11 +220,11 @@ class TcpProxyServer(asyncore.dispatcher):
         self.remote_info = remote_info
         
         if inject_port >= 0:
-            self.logger.debug("Initializing auxiliary server")
+            self.logger.debug("Initializing injection server")
             inject_addr = (address[0], inject_port)
             self.inject_server = TcpInjectionServer(inject_addr)
         else:
-            self.logger.debug("No auxiliary server required")
+            self.logger.debug("No injection server required")
         
         self.handlerCount = 0
         
