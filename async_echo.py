@@ -11,7 +11,7 @@ class EchoHandler(asyncore.dispatcher):
         
         self.logger = logging.getLogger('EchoHandler %s' % str(name))
         
-        self.bytes_read = 0
+        self.bytes_recv = 0
         self.bytes_sent = 0
         
         self.write_buffer = ''
@@ -28,7 +28,7 @@ class EchoHandler(asyncore.dispatcher):
         buff = self.recv(BUF_SIZE)
         buff_size = len(buff)
         self.logger.debug("Received %d bytes" % buff_size)
-        self.bytes_read += buff_size
+        self.bytes_recv += buff_size
         
         try:
             self.write_buffer += buff
@@ -49,7 +49,7 @@ class EchoHandler(asyncore.dispatcher):
     
     def handle_close(self):
         self.logger.debug("handle_close()")
-        self.logger.debug('Total bytes read = %d' % self.bytes_read)
+        self.logger.debug('Total bytes read = %d' % self.bytes_recv)
         self.logger.debug('Total bytes sent = %d' % self.bytes_sent)
         self.close()
 
