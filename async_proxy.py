@@ -25,14 +25,7 @@ def remove_proxy_socket(proxy_socket):
 
 class ProxySocket(asyncore.dispatcher):
     def __init__(self, sock, name, remote_info=None, client_addr=None):
-        asyncore.dispatcher.__init__(self, sock)
-        
         self.logger = logging.getLogger('ProxySocket %s' % str(name))
-        
-        if remote_info:
-            msg = 'remote_info = %s' % remote_info
-            self.logger.debug(msg)
-            self.connect((remote_info[0], remote_info[1]))
         
         self.client_addr = None
         if client_addr:
@@ -47,6 +40,13 @@ class ProxySocket(asyncore.dispatcher):
         
         self.write_buffer = ''
         self.read_buffer = ''
+        
+        asyncore.dispatcher.__init__(self, sock)
+        
+        if remote_info:
+            msg = 'remote_info = %s' % remote_info
+            self.logger.debug(msg)
+            self.connect((remote_info[0], remote_info[1]))
         
         self.logger.debug('Done with __init__')
     
