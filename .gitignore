@@ -6,3 +6,7 @@ in_test*
 out_test*
 
 *.bin
+
+.project
+
+.pydevproject
