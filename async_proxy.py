@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import socket, asyncore, logging, sys
+import socket, asyncore, logging, sys, os
 
 MAX_CLIENT_NUM = 100
 BUF_SIZE = 4096
@@ -278,14 +278,20 @@ class TcpProxyServer(asyncore.dispatcher):
         self.logger.debug('handle_connect()')
 
 if __name__ == '__main__':
-    logging.basicConfig(level=logging.DEBUG, format='%(name)s: %(message)s')
+    try:
+        logging.basicConfig(level=logging.DEBUG, format='%(name)s: %(message)s')
+    except:
+        logging.basicConfig()
     
     if (len(sys.argv) < 3) or (len(sys.argv) > 4):
         logging.debug(
             'Usage: %s <main_port> <remote_addr:remote_port> [inject_port]'
             % sys.argv[0]
         )
-        exit(1)
+        try:
+            exit(1)
+        except:
+            os._exit(1)
     
     main_port = int(float(sys.argv[1]))
     remote_info = sys.argv[2].split(':')
